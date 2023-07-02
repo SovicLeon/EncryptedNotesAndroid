@@ -77,7 +77,9 @@ class Conversations : ComponentActivity() {
                                 .fillMaxHeight()
                                 .wrapContentHeight(align = Alignment.Bottom)
                         ) {
-                            AddConversation("+")
+                            if (pin != null) {
+                                AddConversation("+",pin)
+                            }
                         }
                     }
                 }
@@ -134,10 +136,12 @@ fun ConversationCard(name: String, lastMessage: String, notification: String, mo
 }
 
 @Composable
-fun AddConversation(name: String, modifier: Modifier = Modifier) {
+fun AddConversation(name: String, pin: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Button(onClick = {
-            val intent = Intent(context, AddConversation::class.java)
+            val intent = Intent(context, Conversations::class.java).apply {
+                putExtra("pin", pin)
+            }
             context.startActivity(intent)
          },
         shape = RoundedCornerShape(4.dp),
@@ -175,7 +179,7 @@ fun GreetingPreview2() {
                 .fillMaxHeight()
                 .wrapContentHeight(align = Alignment.Bottom)
         ) {
-            AddConversation("+")
+            AddConversation("+","1234123412341234")
         }
     }
 }

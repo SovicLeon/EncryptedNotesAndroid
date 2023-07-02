@@ -2,6 +2,7 @@ package com.example.encryption
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -25,13 +26,29 @@ import com.example.encryption.ui.theme.EncryptionTheme
 class AddConversation : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val pin = intent.getStringExtra("pin")
+
+        val context = this@AddConversation
+
+        val encryptedFilename = pin?.let { encryptData("filename", it) }
+
+        val fileContent = context.openFileInput(encryptedFilename).bufferedReader().use {
+            it.readText()
+        }
+
+        var data = pin?.let { decryptData(fileContent, it) }
+
+        if (data != null) {
+            Log.d("FileContent", data)
+        }
+
         setContent {
             EncryptionTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val context = LocalContext.current // Get the context
                     AddNoteScreen(context)
                 }
             }
@@ -79,8 +96,11 @@ fun AddNoteScreen(context: Context) { // Pass the context as a parameter
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back Arrow")
                     }
                     OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
+                        value = title.text,
+                        onValueChange = { updatedTitle ->
+                            title = title.copy(text = updatedTitle)
+                            parseTitle(updatedTitle)
+                        },
                         singleLine = true,
                         modifier = Modifier
                             .weight(1f)
@@ -96,15 +116,30 @@ fun AddNoteScreen(context: Context) { // Pass the context as a parameter
 
         // Text input field for the rest of the content
         OutlinedTextField(
-            value = content,
-            onValueChange = { content = it },
-
+            value = content.text,
+            onValueChange = { updatedContent ->
+                content = content.copy(text = updatedContent)
+                parseContent(updatedContent)
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             label = { Text("Enter Note Content") } // Placeholder for the content input field
         )
     }
+}
+
+// Define your parsing functions here
+fun parseTitle(title: String) {
+    // Process the title here
+    // For example, you can display a toast with the updated title
+    // Toast.makeText(context, "Title: $title", Toast.LENGTH_SHORT).show()
+}
+
+fun parseContent(content: String) {
+    // Process the content here
+    // For example, you can display a toast with the updated content
+    // Toast.makeText(context, "Content: $content", Toast.LENGTH_SHORT).show()
 }
 
 @Preview(showBackground = true)
