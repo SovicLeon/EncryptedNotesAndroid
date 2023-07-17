@@ -2,46 +2,42 @@ package com.example.encryption
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.encryption.ui.theme.EncryptionTheme
+import java.util.Date
 
 class AddConversation : ComponentActivity() {
+    var data: MutableCollection<Note> = mutableSetOf()
+    var id: Int = -1
+    var currentItem = Note("","", Date())
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val pin = intent.getStringExtra("pin")
 
+        id = intent.getIntExtra("id", -1)
+
+        if (id > -1) {
+            currentItem = data.elementAt(id)
+        }
+
         val context = this@AddConversation
 
-        val encryptedFilename = pin?.let { encryptData("filename", it) }
-
-        val fileContent = context.openFileInput(encryptedFilename).bufferedReader().use {
-            it.readText()
-        }
-
-        var data = pin?.let { decryptData(fileContent, it) }
-
-        if (data != null) {
-            Log.d("FileContent", data)
-        }
+        data = pin?.let { getFileData(it,context) }!!
 
         setContent {
             EncryptionTheme {
@@ -49,7 +45,7 @@ class AddConversation : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AddNoteScreen(context)
+                    AddNoteScreen(context, currentItem.title, currentItem.content)
                 }
             }
         }
@@ -64,7 +60,7 @@ fun onBackPressed(context: Context) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNoteScreen(context: Context) { // Pass the context as a parameter
+fun AddNoteScreen(context: Context, titleIn: String, contentIn: String) { // Pass the context as a parameter
     var title by remember { mutableStateOf(TextFieldValue()) }
     var content by remember { mutableStateOf(TextFieldValue()) }
 
@@ -96,7 +92,7 @@ fun AddNoteScreen(context: Context) { // Pass the context as a parameter
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back Arrow")
                     }
                     OutlinedTextField(
-                        value = title.text,
+                        value = titleIn,
                         onValueChange = { updatedTitle ->
                             title = title.copy(text = updatedTitle)
                             parseTitle(updatedTitle)
@@ -116,7 +112,7 @@ fun AddNoteScreen(context: Context) { // Pass the context as a parameter
 
         // Text input field for the rest of the content
         OutlinedTextField(
-            value = content.text,
+            value = contentIn,
             onValueChange = { updatedContent ->
                 content = content.copy(text = updatedContent)
                 parseContent(updatedContent)
@@ -147,6 +143,6 @@ fun parseContent(content: String) {
 fun AddNoteScreenPreview() {
     EncryptionTheme {
         val context = LocalContext.current
-        AddNoteScreen(context)
+        AddNoteScreen(context,"a","a")
     }
 }

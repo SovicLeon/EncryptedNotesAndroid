@@ -20,7 +20,7 @@
             android:label="@string/title_activity_add_conversation"
             android:theme="@style/Theme.Encryption" />
         <activity
-            android:name=".Conversations"
+            android:name=".Notes"
             android:exported="false"
             android:label="@string/title_activity_conversations"
             android:theme="@style/Theme.Encryption" />

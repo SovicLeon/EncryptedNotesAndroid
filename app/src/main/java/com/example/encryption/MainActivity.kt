@@ -27,19 +27,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.encryption.ui.theme.EncryptionTheme
+import com.google.gson.Gson
 import javax.crypto.Cipher
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.PBEKeySpec
-import javax.crypto.spec.PBEParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import com.google.gson.reflect.TypeToken
 
 import java.util.*
 
@@ -101,7 +97,7 @@ fun manageFile(context: Context, pin: String) {
         createFileInInternalStorage(context, pin)
     }
 
-    val intent = Intent(context, Conversations::class.java).apply {
+    val intent = Intent(context, Notes::class.java).apply {
         putExtra("pin", pinFinal)
     }
     context.startActivity(intent)
@@ -110,22 +106,49 @@ fun manageFile(context: Context, pin: String) {
 fun createFileInInternalStorage(context: Context, pin: String) {
     val pinFinal = padPin(pin)
 
-    val encryptedFilename = encryptData("filename",pinFinal)
+    var notes: MutableCollection<Note> = mutableSetOf()
 
-    val fileContents = encryptData("123;2023-06-17-18:00;0test;1hi;0kaj;1nic+444;2023-06-17-18:11;0test;1aaa;0kaj;1aaa",pinFinal)
+    notes.add(Note("TestTitle","TestContent",Date(2023,7,3)))
+
+    saveDataToFile(pinFinal,context,notes)
+
+    var dataBack: MutableCollection<Note> = getFileData(pinFinal,context)
+
+    Log.d("FileContent", dataBack.elementAt(0).title)
+}
+
+fun getFileData(pin: String, context: Context): MutableCollection<Note> {
+    val encryptedFilename = encryptData("filename",pin)
+
+    val fileContent = context.openFileInput(encryptedFilename).bufferedReader().use {
+        it.readText()
+    }
+
+    val gson = Gson()
+
+    val collectionType = object : TypeToken<MutableCollection<Note>>() {}.type
+    val decryptedCollection: MutableCollection<Note> = gson.fromJson(decryptData(fileContent,pin), collectionType)
+
+    Log.d("FileContent", decryptedCollection.toString())
+
+    return decryptedCollection
+}
+
+fun saveDataToFile(pin: String, context: Context, data: MutableCollection<Note>): Boolean {
+    val encryptedFilename = encryptData("filename",pin)
+
+    val gson = Gson()
+    val jsonList = gson.toJson(data)
+
+    Log.d("FileContent", jsonList)
+
+    val fileContents = encryptData(jsonList,pin)
 
     context.openFileOutput(encryptedFilename, Context.MODE_PRIVATE).use { fileOutputStream ->
         fileOutputStream.write(fileContents.toByteArray())
     }
 
-    // Read from file
-    val fileContent = context.openFileInput(encryptedFilename).bufferedReader().use {
-        it.readText()
-    }
-
-    // Print the file content
-    Log.d("FileContent", fileContent)
-    Log.d("FileContent", decryptData(fileContent,pinFinal))
+    return true
 }
 
 fun padPin(pin: String): String {

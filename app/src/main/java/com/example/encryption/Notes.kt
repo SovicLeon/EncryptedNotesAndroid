@@ -33,25 +33,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.encryption.ui.theme.EncryptionTheme
 
-class Conversations : ComponentActivity() {
+class Notes : ComponentActivity() {
+    var data: MutableCollection<Note> = mutableSetOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val pin = intent.getStringExtra("pin")
 
-        val context = this@Conversations
+        val context = this@Notes
 
-        val encryptedFilename = pin?.let { encryptData("filename", it) }
-
-        val fileContent = context.openFileInput(encryptedFilename).bufferedReader().use {
-            it.readText()
-        }
-
-        var data = pin?.let { decryptData(fileContent, it) }
-
-        if (data != null) {
-            Log.d("FileContent", data)
-        }
+        data = pin?.let { getFileData(it,context) }!!
 
         setContent {
             EncryptionTheme {
@@ -66,7 +57,7 @@ class Conversations : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         EncryptionTheme {
-                            TextOut("Conversations")
+                            TextOut("Notes")
                             ConversationCard("convo1","hi","*")
                             ConversationCard("convo2","yo i was...","*")
                             ConversationCard("convo3","","")
@@ -139,8 +130,9 @@ fun ConversationCard(name: String, lastMessage: String, notification: String, mo
 fun AddConversation(name: String, pin: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Button(onClick = {
-            val intent = Intent(context, Conversations::class.java).apply {
+            val intent = Intent(context, Notes::class.java).apply {
                 putExtra("pin", pin)
+                putExtra("id", -1)
             }
             context.startActivity(intent)
          },
@@ -168,7 +160,7 @@ fun GreetingPreview2() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         EncryptionTheme {
-            TextOut("Conversations")
+            TextOut("Notes")
             ConversationCard("convo1","hi","*")
             ConversationCard("convo2","yo i was...","*")
             ConversationCard("convo3","","")
