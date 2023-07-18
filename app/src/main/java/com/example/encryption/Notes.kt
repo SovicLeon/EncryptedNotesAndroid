@@ -1,5 +1,6 @@
 package com.example.encryption
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -35,13 +36,17 @@ import com.example.encryption.ui.theme.EncryptionTheme
 
 class Notes : ComponentActivity() {
     var data: MutableCollection<Note> = mutableSetOf()
+    lateinit var pin: String
+    lateinit var context: Context
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val pin = intent.getStringExtra("pin")
+        pin = intent.getStringExtra("pin").toString()
 
-        val context = this@Notes
+        context = this@Notes
 
+        // Initialize the data variable
         data = pin?.let { getFileData(it,context) }!!
 
         setContent {
@@ -58,9 +63,48 @@ class Notes : ComponentActivity() {
                     ) {
                         EncryptionTheme {
                             TextOut("Notes")
-                            ConversationCard("convo1","hi","*")
-                            ConversationCard("convo2","yo i was...","*")
-                            ConversationCard("convo3","","")
+                            for (d in data)
+                                ConversationCard(d.title,d.content.take(5) + "...","*")
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .wrapContentHeight(align = Alignment.Bottom)
+                        ) {
+                            if (pin != null) {
+                                AddConversation("+",pin)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Update the data
+        data = pin?.let { getFileData(it,context) }!!
+
+        // Invalidate the UI
+        setContent {
+            EncryptionTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        EncryptionTheme {
+                            TextOut("Notes")
+                            for (d in data)
+                                ConversationCard(d.title,d.content.take(5) + "...","*")
                         }
                         Box(
                             modifier = Modifier
@@ -130,7 +174,7 @@ fun ConversationCard(name: String, lastMessage: String, notification: String, mo
 fun AddConversation(name: String, pin: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Button(onClick = {
-            val intent = Intent(context, Notes::class.java).apply {
+            val intent = Intent(context, AddNote::class.java).apply {
                 putExtra("pin", pin)
                 putExtra("id", -1)
             }

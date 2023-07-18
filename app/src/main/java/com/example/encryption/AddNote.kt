@@ -2,6 +2,7 @@ package com.example.encryption
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -20,14 +21,15 @@ import androidx.compose.ui.unit.dp
 import com.example.encryption.ui.theme.EncryptionTheme
 import java.util.Date
 
-class AddConversation : ComponentActivity() {
-    var data: MutableCollection<Note> = mutableSetOf()
-    var id: Int = -1
-    var currentItem = Note("","", Date())
+var id: Int = -1
+var data: MutableCollection<Note> = mutableSetOf()
+var currentItem = Note("","", Date())
+lateinit var pin: String
+class AddNote : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val pin = intent.getStringExtra("pin")
+        pin = intent.getStringExtra("pin").toString()
 
         id = intent.getIntExtra("id", -1)
 
@@ -35,9 +37,9 @@ class AddConversation : ComponentActivity() {
             currentItem = data.elementAt(id)
         }
 
-        val context = this@AddConversation
+        val context = this@AddNote
 
-        data = pin?.let { getFileData(it,context) }!!
+        data = getFileData(pin,context)
 
         setContent {
             EncryptionTheme {
@@ -45,24 +47,34 @@ class AddConversation : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AddNoteScreen(context, currentItem.title, currentItem.content)
+                    AddNoteScreen(context)
+                }
+            }
+        }
+    }
+
+    // Reset the setContent function outside of onCreate
+    @Composable
+    fun resetContent() {
+        val context = this@AddNote
+        setContent {
+            EncryptionTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AddNoteScreen(context)
                 }
             }
         }
     }
 }
 
-fun onBackPressed(context: Context) {
-    // Handle back navigation here
-    // For example, you can call finish() on the activity
-    (context as? AddConversation)?.finish()
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNoteScreen(context: Context, titleIn: String, contentIn: String) { // Pass the context as a parameter
-    var title by remember { mutableStateOf(TextFieldValue()) }
-    var content by remember { mutableStateOf(TextFieldValue()) }
+fun AddNoteScreen(context: Context) { // Pass the context as a parameter
+    var title by remember { mutableStateOf(TextFieldValue(currentItem.title)) }
+    var content by remember { mutableStateOf(TextFieldValue(currentItem.content)) }
 
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -71,7 +83,9 @@ fun AddNoteScreen(context: Context, titleIn: String, contentIn: String) { // Pas
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 // You can perform any additional logic before navigating back here
-                onBackPressed(context) // Call the function and pass the context
+                id = -1
+                currentItem = Note("","", Date())
+                (context as? AddNote)?.finishAndRemoveTask()
             }
         }
     }
@@ -92,10 +106,10 @@ fun AddNoteScreen(context: Context, titleIn: String, contentIn: String) { // Pas
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back Arrow")
                     }
                     OutlinedTextField(
-                        value = titleIn,
+                        value = title, // This is the change
                         onValueChange = { updatedTitle ->
-                            title = title.copy(text = updatedTitle)
-                            parseTitle(updatedTitle)
+                            title = updatedTitle
+                            parseTitle(updatedTitle.text, context)
                         },
                         singleLine = true,
                         modifier = Modifier
@@ -112,10 +126,10 @@ fun AddNoteScreen(context: Context, titleIn: String, contentIn: String) { // Pas
 
         // Text input field for the rest of the content
         OutlinedTextField(
-            value = contentIn,
+            value = content,
             onValueChange = { updatedContent ->
-                content = content.copy(text = updatedContent)
-                parseContent(updatedContent)
+                content = updatedContent
+                parseContent(updatedContent.text, context)
             },
             modifier = Modifier
                 .fillMaxSize()
@@ -126,13 +140,33 @@ fun AddNoteScreen(context: Context, titleIn: String, contentIn: String) { // Pas
 }
 
 // Define your parsing functions here
-fun parseTitle(title: String) {
+fun parseTitle(title: String, context: Context) {
+    currentItem.title = title
+
+    if (id == -1) {
+        data.add(currentItem)
+        id = data.size-1
+    } else {
+        data.elementAt(id).title = title
+    }
+
+    saveDataToFile(pin, context, data)
     // Process the title here
     // For example, you can display a toast with the updated title
     // Toast.makeText(context, "Title: $title", Toast.LENGTH_SHORT).show()
 }
 
-fun parseContent(content: String) {
+fun parseContent(content: String, context: Context) {
+    currentItem.content = content
+
+    if (id == -1) {
+        data.add(currentItem)
+        id = data.size-1
+    } else {
+        data.elementAt(id).content = content
+    }
+
+    saveDataToFile(pin, context, data)
     // Process the content here
     // For example, you can display a toast with the updated content
     // Toast.makeText(context, "Content: $content", Toast.LENGTH_SHORT).show()
@@ -143,6 +177,6 @@ fun parseContent(content: String) {
 fun AddNoteScreenPreview() {
     EncryptionTheme {
         val context = LocalContext.current
-        AddNoteScreen(context,"a","a")
+        AddNoteScreen(context)
     }
 }
