@@ -2,6 +2,7 @@ package com.example.encryption
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -33,13 +34,16 @@ class AddNote : ComponentActivity() {
 
         id = intent.getIntExtra("id", -1)
 
-        if (id > -1) {
-            currentItem = data.elementAt(id)
-        }
+        Log.d("FileContent", id.toString())
+        Log.d("FileContent", pin)
 
         val context = this@AddNote
 
         data = getFileData(pin,context)
+
+        if (id > -1) {
+            currentItem = data.elementAt(id)
+        }
 
         setContent {
             EncryptionTheme {

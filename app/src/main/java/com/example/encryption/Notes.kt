@@ -3,6 +3,7 @@ package com.example.encryption
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ScrollState
@@ -76,7 +77,7 @@ class Notes : ComponentActivity() {
                     ) {
                         EncryptionTheme {
                             TextOut("Notes")
-                            ScrollItems(data)
+                            ScrollItems(data, context, pin)
                         }
                     }
                     Box(
@@ -105,58 +106,70 @@ class Notes : ComponentActivity() {
 }
 
 @Composable
-fun ScrollItems(data: MutableCollection<Note>) {
+fun ScrollItems(data: MutableCollection<Note>, context: Context, pin: String) {
     val list = data.toList()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 8.dp)
     ) {
         items(list) { note ->
-            ConversationCard(note.title, note.content.take(5) + "...", note.date.date.toString() + "." + (note.date.month+1).toString() + "." + (note.date.year-100+2000).toString())
+            ConversationCard(note.title, note.content.take(5) + "...", note.date.date.toString() + "." + (note.date.month+1).toString() + "." + (note.date.year-100+2000).toString(), list.indexOf(note), context, pin)
+            Log.d("FileContent", list.indexOf(note).toString())
         }
     }
 }
 
 
 @Composable
-fun ConversationCard(name: String, lastMessage: String, notification: String, modifier: Modifier = Modifier) {
-    Row(
-        horizontalArrangement = Arrangement.Start,
+fun ConversationCard(name: String, lastMessage: String, notification: String, index: Int, context: Context, pin: String, modifier: Modifier = Modifier) {
+    Button(onClick = {
+        val intent = Intent(context, AddNote::class.java).apply {
+                putExtra("pin", pin)
+                putExtra("id", index)
+        }
+        context.startActivity(intent)
+        },
+        shape = RoundedCornerShape(0.dp),
         modifier = Modifier
-            .fillMaxWidth(1f)
+            .fillMaxWidth()
             .height(64.dp)
             .padding(4.dp)
-            //.background(Color.hsv(176f, 0.66f, 0.68f))
-            .background(MaterialTheme.colorScheme.primary)
-            .clip(RoundedCornerShape(8.dp))
     ) {
-        Text(
-            text = name,
-            textAlign = TextAlign.Left,
+        Row(
+            horizontalArrangement = Arrangement.Start,
             modifier = Modifier
-                .fillMaxWidth(0.4f)
-                .fillMaxHeight(1f)
-                .padding(8.dp)
-                .wrapContentHeight(align = Alignment.CenterVertically)
-        )
-        Text(
-            text = lastMessage,
-            textAlign = TextAlign.Left,
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .fillMaxHeight(1f)
-                .padding(8.dp)
-                .wrapContentHeight(align = Alignment.CenterVertically)
-        )
-        Text(
-            text = notification,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth(1f)
-                .fillMaxHeight(1f)
-                .padding(8.dp)
-                .wrapContentHeight(align = Alignment.CenterVertically)
-        )
+                //.background(Color.hsv(176f, 0.66f, 0.68f))
+                .background(MaterialTheme.colorScheme.primary)
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            Text(
+                text = name,
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
+                    .fillMaxHeight(1f)
+                    .padding(8.dp)
+                    .wrapContentHeight(align = Alignment.CenterVertically)
+            )
+            Text(
+                text = lastMessage,
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .fillMaxHeight(1f)
+                    .padding(8.dp)
+                    .wrapContentHeight(align = Alignment.CenterVertically)
+            )
+            Text(
+                text = notification,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(1f)
+                    .padding(8.dp)
+                    .wrapContentHeight(align = Alignment.CenterVertically)
+            )
+        }
     }
 }
 
@@ -194,9 +207,6 @@ fun GreetingPreview2() {
     ) {
         EncryptionTheme {
             TextOut("Notes")
-            ConversationCard("convo1","hi","*")
-            ConversationCard("convo2","yo i was...","*")
-            ConversationCard("convo3","","")
         }
         Box(
             modifier = Modifier
