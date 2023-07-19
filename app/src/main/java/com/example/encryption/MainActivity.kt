@@ -108,7 +108,7 @@ fun createFileInInternalStorage(context: Context, pin: String) {
 
     var notes: MutableCollection<Note> = mutableSetOf()
 
-    notes.add(Note("TestTitle","TestContent",Date(2023,7,3)))
+    notes.add(Note("TestTitle","TestContent",Date()))
 
     saveDataToFile(pinFinal,context,notes)
 

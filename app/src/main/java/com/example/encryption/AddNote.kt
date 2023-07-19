@@ -2,7 +2,6 @@ package com.example.encryption
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -23,10 +22,11 @@ import java.util.Date
 
 var id: Int = -1
 var data: MutableCollection<Note> = mutableSetOf()
-var currentItem = Note("","", Date())
+lateinit var currentItem: Note
 lateinit var pin: String
 class AddNote : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        currentItem = Note("","", Date())
         super.onCreate(savedInstanceState)
 
         pin = intent.getStringExtra("pin").toString()
@@ -41,22 +41,6 @@ class AddNote : ComponentActivity() {
 
         data = getFileData(pin,context)
 
-        setContent {
-            EncryptionTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AddNoteScreen(context)
-                }
-            }
-        }
-    }
-
-    // Reset the setContent function outside of onCreate
-    @Composable
-    fun resetContent() {
-        val context = this@AddNote
         setContent {
             EncryptionTheme {
                 Surface(
@@ -83,9 +67,7 @@ fun AddNoteScreen(context: Context) { // Pass the context as a parameter
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 // You can perform any additional logic before navigating back here
-                id = -1
-                currentItem = Note("","", Date())
-                (context as? AddNote)?.finishAndRemoveTask()
+                (context as? AddNote)?.finish()
             }
         }
     }
@@ -149,11 +131,7 @@ fun parseTitle(title: String, context: Context) {
     } else {
         data.elementAt(id).title = title
     }
-
     saveDataToFile(pin, context, data)
-    // Process the title here
-    // For example, you can display a toast with the updated title
-    // Toast.makeText(context, "Title: $title", Toast.LENGTH_SHORT).show()
 }
 
 fun parseContent(content: String, context: Context) {
@@ -165,11 +143,7 @@ fun parseContent(content: String, context: Context) {
     } else {
         data.elementAt(id).content = content
     }
-
     saveDataToFile(pin, context, data)
-    // Process the content here
-    // For example, you can display a toast with the updated content
-    // Toast.makeText(context, "Content: $content", Toast.LENGTH_SHORT).show()
 }
 
 @Preview(showBackground = true)
