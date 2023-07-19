@@ -166,7 +166,8 @@ class Notes : ComponentActivity() {
                     .fillMaxWidth(0.4f)
                     .fillMaxHeight(1f)
                     .padding(8.dp)
-                    .wrapContentHeight(align = Alignment.CenterVertically)
+                    .wrapContentHeight(align = Alignment.CenterVertically),
+                color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
                 text = lastMessage,
@@ -175,7 +176,8 @@ class Notes : ComponentActivity() {
                     .fillMaxWidth(0.5f)
                     .fillMaxHeight(1f)
                     .padding(8.dp)
-                    .wrapContentHeight(align = Alignment.CenterVertically)
+                    .wrapContentHeight(align = Alignment.CenterVertically),
+                color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
                 text = notification,
@@ -184,7 +186,8 @@ class Notes : ComponentActivity() {
                     .fillMaxWidth(1f)
                     .fillMaxHeight(1f)
                     .padding(8.dp)
-                    .wrapContentHeight(align = Alignment.CenterVertically)
+                    .wrapContentHeight(align = Alignment.CenterVertically),
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 

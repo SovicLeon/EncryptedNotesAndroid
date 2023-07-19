@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
                         TextFieldPIN(pinValue.value) { newValue ->
                             pinValue.value = newValue
                         }
+                        Spacer(modifier = Modifier.height(32.dp))
                         ButtonLogin(pinValue.value) { pin ->
                             Log.d("pin", pin)
                             val context = this@MainActivity

@@ -18,7 +18,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.encryption.ui.theme.EncryptionTheme
+import java.time.format.TextStyle
 import java.util.Date
 
 var id: Int = -1
@@ -101,8 +103,9 @@ fun AddNoteScreen(context: Context) { // Pass the context as a parameter
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp), // Occupy remaining width
-                        label = { Text("Enter Title") } // Placeholder for the title input field
-                    )
+                        label = { Text("Enter Title") }, // Placeholder for the title input field
+                        textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
+                        )
                 }
             },
             modifier = Modifier
