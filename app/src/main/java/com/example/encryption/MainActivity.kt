@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.encryption.ui.theme.EncryptionTheme
 import com.google.gson.Gson
 import javax.crypto.Cipher
@@ -196,7 +198,8 @@ fun TextOut(name: String, modifier: Modifier = Modifier) {
     Text(
         text = name,
         modifier = Modifier
-            .padding(16.dp)
+            .padding(16.dp),
+        fontSize = 18.sp
     )
 }
 
