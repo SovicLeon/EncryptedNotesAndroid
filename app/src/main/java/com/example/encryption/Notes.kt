@@ -1,14 +1,18 @@
 package com.example.encryption
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +44,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.encryption.ui.theme.EncryptionTheme
 import androidx.compose.material.Colors
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 
 
@@ -56,12 +62,12 @@ class Notes : ComponentActivity() {
         data = pin?.let { getFileData(it, context) }!!
 
         setContent {
-            NotesContent(data)
+            NotesContent()
         }
     }
 
     @Composable
-    fun NotesContent(data: MutableCollection<Note>) {
+    fun NotesContent() {
         EncryptionTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -77,7 +83,7 @@ class Notes : ComponentActivity() {
                     ) {
                         EncryptionTheme {
                             TextOut("Notes")
-                            ScrollItems(data, context, pin)
+                            ScrollItems()
                         }
                     }
                     Box(
@@ -100,47 +106,58 @@ class Notes : ComponentActivity() {
         data = pin?.let { getFileData(it, context) }!!
 
         setContent {
-            NotesContent(data)
+            NotesContent()
         }
     }
-}
 
-@Composable
-fun ScrollItems(data: MutableCollection<Note>, context: Context, pin: String) {
-    val list = data.toList()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp)
-    ) {
-        items(list) { note ->
-            ConversationCard(note.title, note.content.take(5) + "...", note.date.date.toString() + "." + (note.date.month+1).toString() + "." + (note.date.year-100+2000).toString(), list.indexOf(note), context, pin)
-            Log.d("FileContent", list.indexOf(note).toString())
+    @Composable
+    fun ScrollItems() {
+        val list = data.toList()
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 8.dp)
+        ) {
+            items(list) { note ->
+                ConversationCard(note.title, note.content.take(5) + "...", note.date.date.toString() + "." + (note.date.month+1).toString() + "." + (note.date.year-100+2000).toString(), list.indexOf(note), {
+                    onDeleteNote()
+                })
+                Log.d("FileContent", list.indexOf(note).toString())
+            }
         }
     }
-}
 
-
-@Composable
-fun ConversationCard(name: String, lastMessage: String, notification: String, index: Int, context: Context, pin: String, modifier: Modifier = Modifier) {
-    Button(onClick = {
-        val intent = Intent(context, AddNote::class.java).apply {
-                putExtra("pin", pin)
-                putExtra("id", index)
+    private fun onDeleteNote() {
+        data = pin?.let { getFileData(it, context) }!!
+        setContent {
+            NotesContent()
         }
-        context.startActivity(intent)
-        },
-        shape = RoundedCornerShape(0.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .padding(4.dp)
-    ) {
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun ConversationCard(name: String, lastMessage: String, notification: String, index: Int,onDeleteNote: () -> Unit, modifier: Modifier = Modifier) {
+        val showDialog = remember { mutableStateOf(false) }
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 //.background(Color.hsv(176f, 0.66f, 0.68f))
+                .fillMaxWidth()
+                .height(64.dp)
+                .padding(4.dp)
                 .background(MaterialTheme.colorScheme.primary)
                 .clip(RoundedCornerShape(8.dp))
+                .combinedClickable(
+                    onClick = {
+                        val intent = Intent(context, AddNote::class.java).apply {
+                            putExtra("pin", pin)
+                            putExtra("id", index)
+                        }
+                        context.startActivity(intent)
+                    },
+                    onLongClick = {
+                        showDialog.value = true
+                    },
+                )
         ) {
             Text(
                 text = name,
@@ -170,8 +187,64 @@ fun ConversationCard(name: String, lastMessage: String, notification: String, in
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
         }
+
+        if (showDialog.value) {
+            DeleteWindow(
+                onConfirmDelete = {
+                    data.remove(data.elementAt(index))
+                    saveDataToFile(pin, context, data)
+                    showDialog.value = false
+                    onDeleteNote()
+                },
+                onDismiss = {
+                    showDialog.value = false
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun DeleteWindow(onConfirmDelete: () -> Unit, onDismiss: () -> Unit) {
+        Column (
+            modifier = Modifier
+                .border(2.dp,Color.Red)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Are you sure you want to delete?",
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Button(
+                    onClick = {
+                        onConfirmDelete()
+                    },
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .fillMaxWidth(0.5f)
+                ) {
+                    Text("Yes")
+                }
+
+                Button(
+                    onClick = {
+                        onDismiss()
+                    },
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .fillMaxWidth(1f)
+                ) {
+                    Text("No")
+                }
+            }
+        }
     }
 }
+
 
 @Composable
 fun AddConversation(name: String, pin: String, modifier: Modifier = Modifier) {
