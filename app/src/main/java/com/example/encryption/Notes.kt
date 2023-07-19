@@ -92,7 +92,7 @@ class Notes : ComponentActivity() {
                             .padding(bottom = 8.dp)
                     ) {
                         if (pin != null) {
-                            AddConversation("Add note", pin)
+                            AddNote("Add note", pin)
                         }
                     }
                 }
@@ -118,7 +118,7 @@ class Notes : ComponentActivity() {
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             items(list) { note ->
-                ConversationCard(note.title, note.content.take(5) + "...", note.date.date.toString() + "." + (note.date.month+1).toString() + "." + (note.date.year-100+2000).toString(), list.indexOf(note), {
+                NoteCard(note.title, note.content.take(5) + "...", note.date.date.toString() + "." + (note.date.month+1).toString() + "." + (note.date.year-100+2000).toString(), list.indexOf(note), {
                     onDeleteNote()
                 })
                 Log.d("FileContent", list.indexOf(note).toString())
@@ -135,7 +135,7 @@ class Notes : ComponentActivity() {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ConversationCard(name: String, lastMessage: String, notification: String, index: Int,onDeleteNote: () -> Unit, modifier: Modifier = Modifier) {
+    fun NoteCard(name: String, lastMessage: String, notification: String, index: Int,onDeleteNote: () -> Unit, modifier: Modifier = Modifier) {
         val showDialog = remember { mutableStateOf(false) }
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -250,7 +250,7 @@ class Notes : ComponentActivity() {
 
 
 @Composable
-fun AddConversation(name: String, pin: String, modifier: Modifier = Modifier) {
+fun AddNote(name: String, pin: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Button(onClick = {
             val intent = Intent(context, AddNote::class.java).apply {
@@ -290,7 +290,7 @@ fun GreetingPreview2() {
                 .fillMaxHeight()
                 .wrapContentHeight(align = Alignment.Bottom)
         ) {
-            AddConversation("Add note","1234123412341234")
+            AddNote("Add note","1234123412341234")
         }
     }
 }

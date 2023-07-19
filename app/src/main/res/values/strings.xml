@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Encryption</string>
-    <string name="title_activity_conversations">Conversations</string>
-    <string name="title_activity_add_conversation">AddConversation</string>
+    <string name="app_name">Lock Notes</string>
+    <string name="title_activity_notes">Notes</string>
+    <string name="title_activity_add_note">AddNote</string>
 </resources>
