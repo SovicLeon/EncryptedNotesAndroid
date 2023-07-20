@@ -1,4 +1,4 @@
-package com.example.encryption.ui.theme
+package com.leonsovic.encryption.ui.theme
 
 import android.app.Activity
 import android.os.Build

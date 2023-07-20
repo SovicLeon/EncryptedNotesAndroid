@@ -1,4 +1,4 @@
-package com.example.encryption
+package com.leonsovic.encryption
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.example.encryption
+package com.leonsovic.encryption
 
 import android.app.Dialog
 import android.content.Context
@@ -42,7 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.encryption.ui.theme.EncryptionTheme
+import com.leonsovic.encryption.ui.theme.EncryptionTheme
 import androidx.compose.material.Colors
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember

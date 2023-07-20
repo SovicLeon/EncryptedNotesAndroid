@@ -1,4 +1,4 @@
-package com.example.encryption
+package com.leonsovic.encryption
 
 import android.content.Context
 import android.content.Intent
@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.encryption.ui.theme.EncryptionTheme
+import com.leonsovic.encryption.ui.theme.EncryptionTheme
 import com.google.gson.Gson
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
@@ -111,7 +111,13 @@ fun createFileInInternalStorage(context: Context, pin: String) {
 
     var notes: MutableCollection<Note> = mutableSetOf()
 
-    notes.add(Note("TestTitle","TestContent",Date()))
+    notes.add(
+        Note("How To","Enter your PIN to view locked notes.\n" +
+            "\n" +
+            "Add notes instantly by typing.\n" +
+            "\n" +
+            "Tap to read/edit, hold to remove.",Date())
+    )
 
     saveDataToFile(pinFinal,context,notes)
 

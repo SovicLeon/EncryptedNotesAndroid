@@ -1,4 +1,4 @@
-package com.example.encryption.ui.theme
+package com.leonsovic.encryption.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

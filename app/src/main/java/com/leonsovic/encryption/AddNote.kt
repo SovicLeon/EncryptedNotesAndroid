@@ -1,4 +1,4 @@
-package com.example.encryption
+package com.leonsovic.encryption
 
 import android.content.Context
 import android.os.Bundle
@@ -19,7 +19,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.encryption.ui.theme.EncryptionTheme
+import com.leonsovic.encryption.ui.theme.EncryptionTheme
 import java.time.format.TextStyle
 import java.util.Date
 

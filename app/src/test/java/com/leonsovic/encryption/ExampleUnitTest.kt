@@ -1,4 +1,4 @@
-package com.example.encryption
+package com.leonsovic.encryption
 
 import org.junit.Test
 
