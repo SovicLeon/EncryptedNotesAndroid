@@ -20,11 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.leonsovic.encryption.ui.theme.EncryptionTheme
-import java.time.format.TextStyle
 import java.util.Date
 
 var id: Int = -1
-var data: MutableCollection<Note> = mutableSetOf()
+var data: MutableList<Note> = mutableListOf()
 lateinit var currentItem: Note
 lateinit var pin: String
 class AddNote : ComponentActivity() {
@@ -133,8 +132,10 @@ fun parseTitle(title: String, context: Context) {
     currentItem.title = title
 
     if (id == -1) {
-        data.add(currentItem)
-        id = data.size-1
+        //data.add(currentItem)
+        //id = data.size-1
+        data.add(0, currentItem)
+        id = 0
     } else {
         data.elementAt(id).title = title
     }
@@ -145,8 +146,10 @@ fun parseContent(content: String, context: Context) {
     currentItem.content = content
 
     if (id == -1) {
-        data.add(currentItem)
-        id = data.size-1
+        //data.add(currentItem)
+        //id = data.size-1
+        data.add(0, currentItem)
+        id = 0
     } else {
         data.elementAt(id).content = content
     }

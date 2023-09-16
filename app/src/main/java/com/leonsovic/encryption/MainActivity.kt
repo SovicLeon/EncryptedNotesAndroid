@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -109,7 +108,7 @@ fun manageFile(context: Context, pin: String) {
 fun createFileInInternalStorage(context: Context, pin: String) {
     val pinFinal = padPin(pin)
 
-    var notes: MutableCollection<Note> = mutableSetOf()
+    val notes: MutableList<Note> = mutableListOf()
 
     notes.add(
         Note("How To","Enter your PIN to view locked notes.\n" +
@@ -121,12 +120,12 @@ fun createFileInInternalStorage(context: Context, pin: String) {
 
     saveDataToFile(pinFinal,context,notes)
 
-    var dataBack: MutableCollection<Note> = getFileData(pinFinal,context)
+    val dataBack: MutableList<Note> = getFileData(pinFinal,context)
 
     Log.d("FileContent", dataBack.elementAt(0).title)
 }
 
-fun getFileData(pin: String, context: Context): MutableCollection<Note> {
+fun getFileData(pin: String, context: Context): MutableList<Note> {
     val encryptedFilename = encryptData("filename",pin)
 
     val fileContent = context.openFileInput(encryptedFilename).bufferedReader().use {
@@ -135,15 +134,15 @@ fun getFileData(pin: String, context: Context): MutableCollection<Note> {
 
     val gson = Gson()
 
-    val collectionType = object : TypeToken<MutableCollection<Note>>() {}.type
-    val decryptedCollection: MutableCollection<Note> = gson.fromJson(decryptData(fileContent,pin), collectionType)
+    val listType = object : TypeToken<MutableList<Note>>() {}.type
+    val decryptedList: MutableList<Note> = gson.fromJson(decryptData(fileContent,pin), listType)
 
-    Log.d("FileContent", decryptedCollection.toString())
+    Log.d("FileContent", decryptedList.toString())
 
-    return decryptedCollection
+    return decryptedList
 }
 
-fun saveDataToFile(pin: String, context: Context, data: MutableCollection<Note>): Boolean {
+fun saveDataToFile(pin: String, context: Context, data: MutableList<Note>): Boolean {
     val encryptedFilename = encryptData("filename",pin)
 
     val gson = Gson()
