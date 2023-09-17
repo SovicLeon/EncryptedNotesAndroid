@@ -227,7 +227,7 @@ fun TextFieldPIN(text: TextFieldValue, onValueChange: (TextFieldValue) -> Unit) 
 fun ButtonLogin(pinValue: TextFieldValue, onClick: (String) -> Unit) {
     Button(onClick = {
         onClick(pinValue.text) },
-        shape = RoundedCornerShape(4.dp))
+        shape = RoundedCornerShape(8.dp))
     {
         Text(text = "Login")
     }

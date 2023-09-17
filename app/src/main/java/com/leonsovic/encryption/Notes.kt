@@ -221,7 +221,8 @@ class Notes : ComponentActivity() {
                     },
                     modifier = Modifier
                         .padding(end = 8.dp)
-                        .fillMaxWidth(0.5f)
+                        .fillMaxWidth(0.5f),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
                     Text("Yes")
                 }
@@ -232,7 +233,8 @@ class Notes : ComponentActivity() {
                     },
                     modifier = Modifier
                         .padding(end = 8.dp)
-                        .fillMaxWidth(1f)
+                        .fillMaxWidth(1f),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
                     Text("No")
                 }
